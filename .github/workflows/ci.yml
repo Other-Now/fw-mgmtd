@@ -82,7 +82,8 @@ jobs:
         run: bash scripts/fuzz.sh 120 | tee fuzz-summary.txt
       - name: summary
         if: always()
-        run: { echo '### fuzz'; echo '```'; cat fuzz-summary.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          { echo '### fuzz'; echo '```'; cat fuzz-summary.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,0 +1,6 @@
+customer=Acme
+license-id=L-1
+device-id=*
+issued=1
+expires=2
+signature=AAAA

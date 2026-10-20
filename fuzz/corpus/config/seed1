@@ -1,0 +1,4 @@
+set system hostname fw1
+set firewall rule 10 action accept
+set interfaces interface eth0 description "x y \"z\""
+# c

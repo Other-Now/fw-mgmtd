@@ -1,0 +1,13 @@
+Uptime:            133s
+PID:               243418
+RSS:               14224 kB
+Threads:           5
+Open fds:          9
+State dir free:    956872.5 MiB (/home/chiku/fwm-run/bench/state)
+Running commit:    301 (14 statements)
+SSH:               port 2222, 1 active, 54 logins, 0 auth failures
+HTTPS:             port 8443, 77881 connections, 128317 requests, 0 handshake failures, 27 cert reloads
+Certificate:       290s left
+License:           valid (expires in 29 days)
+Firewall:          1 rules, recompiled 1 times
+Syslog UDP sent:   0

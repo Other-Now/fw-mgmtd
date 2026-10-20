@@ -1,0 +1,134 @@
+$ ssh admin@fw 'show configuration'
+## commit 1
+firewall {
+    rule 10 {
+        action accept;
+    }
+}
+system {
+    certificate {
+        acme-directory https://localhost:14000/dir;
+        alert-days 1;
+        common-name localhost;
+        renew-before 240;
+    }
+    hostname fw-e2e;
+    login {
+        user admin {
+            api-token-sha256 e18e21465409a82af47e1d1830afe5caa55c7af81aad5ab19a49447f72091506;
+            role admin;
+            ssh-key "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL4X/tDGj/IX27rfu09qss6Beq4S0yy9GkSPgPzIDPaz";
+        }
+        user bob {
+            api-token-sha256 5ce75087f977b54707d713a23b83da6f8e89dc69d3856942448434b9759a6c81;
+            role viewer;
+            ssh-key "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKwWfOJInR5DlwDVGhfo3uHTUQ4F8npg3HnDW0b9cHGd";
+        }
+    }
+    services {
+        https {
+            port 8443;
+        }
+        ssh {
+            port 2222;
+        }
+    }
+}
+
+$ ssh admin@fw 'configure; set firewall rule 20 action drop; set firewall rule 20 source 203.0.113.0/24; set firewall rule 20 protocol tcp; set firewall rule 20 port 23; compare; commit comment "block telnet from TEST-NET-3"'
+Entering configuration mode (private candidate, base commit 1)
++ set firewall rule 20 action drop
++ set firewall rule 20 port 23
++ set firewall rule 20 protocol tcp
++ set firewall rule 20 source 203.0.113.0/24
+commit complete (commit 2, 4 changes, 6037 us)
+
+$ ssh admin@fw 'configure; set firewall rule 30 source 198.51.100.0/24; commit'
+Entering configuration mode (private candidate, base commit 2)
+error: commit failed: firewall rule 30: 'action' is mandatory
+
+$ ssh admin@fw 'configure; set system services ssh port 0'
+Entering configuration mode (private candidate, base commit 2)
+error: value out of range 1..65535
+
+$ ssh admin@fw 'configure; set system hostname edge-02; commit confirmed 2'
+Entering configuration mode (private candidate, base commit 2)
+commit confirmed will be automatically rolled back in 2s unless confirmed
+commit complete (commit 3, 1 changes, 15089 us)
+
+$ ssh admin@fw 'show commits'
+  #  commit  time                  user         via            changes  comment
+  0       4  2026-10-20T04:38:00Z  system       confirm-timer        1  commit confirmed timeout: rolled back to commit 2
+  1       3  2026-10-20T04:37:58Z  admin        ssh                  1  
+  2       2  2026-10-20T04:37:57Z  admin        ssh                  4  block telnet from TEST-NET-3
+  3       1  2026-10-20T04:37:57Z  system       bootstrap           14  initial configuration
+
+$ ssh admin@fw 'show configuration system hostname'
+## commit 4
+system {
+    hostname fw-e2e;
+}
+
+$ ssh admin@fw 'request certificate renew'
+certificate renewed in 547 ms
+
+$ ssh admin@fw 'show certificate'
+Subject:       (empty; identity is in the SAN)
+Issuer:        /CN=Pebble Intermediate CA 7a3333
+Serial:        4AE4970616C0BCB0
+SAN:           localhost
+Valid:         2026-10-20T04:38:02Z .. 2026-10-20T04:43:01Z
+Remaining:     297s (0 days)
+Source:        acme:https://localhost:14000/dir
+Renew before:  240s   alert-days 1
+Renewals:      1 ok, 0 failed, last took 547 ms
+
+$ ssh admin@fw 'show license'
+State:      valid (expires in 29 days)
+Device id:  e2e-device
+License:    L-E2E  customer E2E
+Bound to:   e2e-device
+Issued:     2026-10-20T04:37:57Z
+Expires:    2026-11-19T04:37:57Z  (+7 days grace)
+Features:   url-filtering  [active]
+
+$ ssh bob@fw 'configure'      # bob is a viewer
+error: permission denied: 'configure' requires role admin
+
+--- interactive shell with a pty: typed 'sh<TAB>co<TAB>', 'n<TAB>', 'fi<TAB>', '?', 'r<TAB>', Enter ---
+fw-mgmtd management CLI. Type 'help' or press '?'. TAB completes.
+admin@fw> show co
+configuration  commits  
+admin@fw> show configuration firewall ?
+Possible completions:
+  rule
+  url-filter
+admin@fw> show configuration firewall rule 
+## commit 4
+firewall {
+    rule 10 {
+        action accept;
+    }
+    rule 20 {
+        action drop;
+        port 23;
+        protocol tcp;
+        source 203.0.113.0/24;
+    }
+}
+admin@fw> exit
+
+--- the same change through the REST API ---
+$ curl -X POST https://fw:8443/api/v1/config -d '{"base":4,"set":["firewall rule 40 action reject"]}'
+{"changes":1,"commit":5,"us":{"apply":37,"persist":8184,"total":8263,"validate":23},"warnings":[]}
+$ (same request again, stale base)
+{"base":4,"error":"running configuration changed","running":5}
+
+--- audit trail (RFC 5424, state/fw-mgmtd.log) ---
+<133>1 2026-10-20T04:37:57.984988Z fw-e2e fw-mgmtd 1345 COMMIT [audit@32473 user="admin" via="ssh" commit="2" changes="4" comment="block telnet from TEST-NET-3"] commit 2 by admin
+<133>1 2026-10-20T04:37:58.177700Z edge-02 fw-mgmtd 1345 COMMIT [audit@32473 user="admin" via="ssh" commit="3" changes="1" comment=""] commit 3 by admin (confirmed, pending)
+<133>1 2026-10-20T04:38:00.074068Z fw-e2e fw-mgmtd 1345 COMMIT [audit@32473 user="system" via="confirm-timer" commit="4" changes="1" comment="commit confirmed timeout: rolled back to commit 2"] commit 4 by system
+<132>1 2026-10-20T04:38:00.074115Z fw-e2e fw-mgmtd 1345 CONFIRM_REVERT - commit confirmed not confirmed in time; reverted to commit 2
+<133>1 2026-10-20T04:38:04.473976Z fw-e2e fw-mgmtd 1345 CERT_RENEWED [cert@32473 cn="localhost" serial="4AE4970616C0BCB0" not-after="2026-10-20T04:43:01Z" ms="547"] certificate renewed (manual by admin), serial 4AE4970616C0BCB0
+<132>1 2026-10-20T04:38:04.643117Z fw-e2e fw-mgmtd 1345 AUTHZ_DENY [audit@32473 user="bob" via="ssh" role="viewer" need="admin" cmd="configure"] bob denied: configure
+<133>1 2026-10-20T04:38:07.078930Z fw-e2e fw-mgmtd 1345 COMMIT [audit@32473 user="admin" via="api" commit="5" changes="1" comment="via api"] commit 5 by admin

@@ -1,0 +1,16 @@
+# commit latency: one-leaf change on an N-leaf config, 200 iterations each; fsync on every commit
+N=100 leaves (3543 bytes on disk)
+  commit total                     n=200   p50=   3555.2  p90=   3876.7  p99=   5942.4  max=  11274.7 us
+    validate+diff                  n=200   p50=     36.2  p90=     39.7  p99=     62.7  max=     80.4 us
+    persist (write+fsync+rename)   n=200   p50=   3488.8  p90=   3808.1  p99=   5824.3  max=  11158.7 us
+  rollback 1 (load + commit)       n=200   p50=   3713.1  p90=   4116.5  p99=   5721.8  max=   6614.5 us
+N=1000 leaves (35723 bytes on disk)
+  commit total                     n=200   p50=   4449.4  p90=   5246.3  p99=   7752.8  max=  11874.4 us
+    validate+diff                  n=200   p50=    318.5  p90=    353.9  p99=    837.0  max=    953.1 us
+    persist (write+fsync+rename)   n=200   p50=   4088.2  p90=   4858.5  p99=   7328.4  max=  11506.5 us
+  rollback 1 (load + commit)       n=200   p50=   5428.9  p90=   6306.3  p99=   8331.2  max=  11408.5 us
+N=10000 leaves (368490 bytes on disk)
+  commit total                     n=200   p50=  11993.8  p90=  13475.9  p99=  20767.0  max=  54040.1 us
+    validate+diff                  n=200   p50=   3455.0  p90=   3688.4  p99=   7426.6  max=  10247.4 us
+    persist (write+fsync+rename)   n=200   p50=   8416.4  p90=   9775.7  p99=  15912.6  max=  50636.8 us
+  rollback 1 (load + commit)       n=200   p50=  20836.8  p90=  22555.9  p99=  30932.6  max= 112664.0 us

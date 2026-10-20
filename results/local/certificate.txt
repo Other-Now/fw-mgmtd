@@ -1,0 +1,11 @@
+Subject:       
+Issuer:        /CN=Pebble Intermediate CA 67e821
+Serial:        5C0FF6C32CB29D93
+SAN:           localhost
+Valid:         2026-10-20T04:32:26Z .. 2026-10-20T04:37:25Z
+Remaining:     290s (0 days)
+Source:        acme:https://localhost:14000/dir
+Renew before:  240s   alert-days 1
+Renewals:      26 ok, 0 failed, last took 545 ms
+CERT_RENEWED log lines: 26
+<133>1 2026-10-20T04:32:28.089586Z bench-299 fw-mgmtd 243418 CERT_RENEWED [cert@32473 cn="localhost" serial="5C0FF6C32CB29D93" not-after="2026-10-20T04:37:25Z" ms="545"] certificate renewed (expires in 238s < renew-before 240s), serial 5C0FF6C32CB29D93

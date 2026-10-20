@@ -1,0 +1,7 @@
+customer=Acme
+license-id=L-1
+device-id=*
+features=url-filtering,api
+issued=1700000000
+expires=1800000000
+grace-days=7

@@ -1,0 +1,7 @@
+show configuration
+configure
+set firewall rule 20 action drop
+show | display set
+compare
+rollback 1
+exit discard

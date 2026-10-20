@@ -1,0 +1,5 @@
+sh conf fire | match rule
+conf
+set interfaces interface eth0 description "a \"b\" c"
+delete firewall rule 10
+update

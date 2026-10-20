@@ -1,0 +1,92 @@
+name: ci
+on: [push, pull_request, workflow_dispatch]
+
+env:
+  PEBBLE_VERSION: v2.7.0
+
+jobs:
+  test-and-bench:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cmake ninja-build libssl-dev libssh-dev
+          curl -fsSL -o /tmp/pebble.tgz https://github.com/letsencrypt/pebble/releases/download/$PEBBLE_VERSION/pebble-linux-amd64.tar.gz
+          mkdir -p /tmp/pebble && tar xzf /tmp/pebble.tgz -C /tmp/pebble
+          sudo install "$(find /tmp/pebble -type f -name pebble)" /usr/local/bin/pebble
+      - name: build (hardened release)
+        run: bash scripts/build.sh release
+      - name: hardening check
+        run: bash scripts/hardening.sh | tee results-hardening.txt
+      - name: unit tests
+        run: ~/fwm-build/release/unit_tests
+      - name: end-to-end (Pebble ACME + OpenSSH client + curl)
+        run: bash scripts/e2e.sh
+      - name: OCSP + CRL
+        run: bash scripts/revocation.sh
+      - name: crash test (20 x kill -9 mid-commit)
+        run: bash scripts/crash.sh 20 | tee results-crash.txt
+      - name: benchmarks
+        run: bash scripts/bench.sh ci
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo '### fw-mgmtd CI'; echo '```'
+            cat results/ci/env.txt results/ci/commit.txt results/ci/ssh.txt results/ci/https-renewal.txt 2>/dev/null
+            tail -1 results-crash.txt 2>/dev/null; cat results-hardening.txt 2>/dev/null
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: results-ci
+          path: |
+            results/ci
+            results-*.txt
+
+  sanitizers:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cmake ninja-build libssl-dev libssh-dev
+          curl -fsSL -o /tmp/pebble.tgz https://github.com/letsencrypt/pebble/releases/download/$PEBBLE_VERSION/pebble-linux-amd64.tar.gz
+          mkdir -p /tmp/pebble && tar xzf /tmp/pebble.tgz -C /tmp/pebble
+          sudo install "$(find /tmp/pebble -type f -name pebble)" /usr/local/bin/pebble
+      - name: ASan + UBSan build
+        run: bash scripts/build.sh asan
+      - name: unit tests under ASan + UBSan
+        env: { ASAN_OPTIONS: "detect_leaks=1:halt_on_error=1", UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1" }
+        run: ~/fwm-build/asan/unit_tests
+      - name: e2e with the ASan daemon
+        env: { ASAN_OPTIONS: "detect_leaks=1:halt_on_error=1", UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1" }
+        run: |
+          BIN=$HOME/fwm-build/asan RUN=$HOME/fwm-run/e2e-asan bash scripts/e2e.sh
+          ! grep -E "Sanitizer|runtime error" $HOME/fwm-run/e2e-asan/daemon.*.out
+
+  fuzz:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cmake ninja-build libssl-dev clang-18 libclang-rt-18-dev
+      - name: libFuzzer, 120 s per target (ASan + UBSan)
+        env: { CLANGXX: clang++-18, OUT: results/fuzz-ci }
+        run: bash scripts/fuzz.sh 120 | tee fuzz-summary.txt
+      - name: summary
+        if: always()
+        run: { echo '### fuzz'; echo '```'; cat fuzz-summary.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fuzz-ci
+          path: |
+            results/fuzz-ci
+            ~/fwm-fuzz/crash-*

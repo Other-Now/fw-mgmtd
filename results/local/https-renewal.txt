@@ -1,0 +1,4 @@
+# HTTPS load: 4 threads x new TLS connection per request for 60s, cert renewed every 2000 ms via ACME
+requests ok=77855 failed=0   keep-alive ok=50438 failed=0   renewals ok=24 failed=0   distinct server certs seen=24
+request (connect+TLS+GET+close)    n=77855 p50=   2870.6  p90=   4232.9  p99=   6615.3  max=  58120.1 us
+ACME renewal (API round trip)      n=24    p50=   2497.4  p90=   2575.9  p99=   2644.4  max=   2644.4 ms

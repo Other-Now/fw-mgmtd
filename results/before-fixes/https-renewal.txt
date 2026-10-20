@@ -1,0 +1,9 @@
+# HTTPS load: 4 threads x new TLS connection per request for 60s, cert renewed every 2000 ms via ACME
+requests ok=74738 failed=38   keep-alive ok=49403 failed=0   renewals ok=29 failed=0   distinct server certs seen=30
+request (connect+TLS+GET+close)    n=74738 p50=   2854.1  p90=   4429.5  p99=   7775.9  max=  39072.1 us
+ACME renewal (API round trip)      n=29    p50=    553.4  p90=    611.0  p99=    778.7  max=    778.7 ms
+error: error:0A000086:SSL routines::certificate verify failed
+error: error:0A000086:SSL routines::certificate verify failed
+error: error:0A000086:SSL routines::certificate verify failed
+error: error:0A000086:SSL routines::certificate verify failed
+error: error:0A000086:SSL routines::certificate verify failed

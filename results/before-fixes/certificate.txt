@@ -1,0 +1,11 @@
+Subject:       
+Issuer:        /CN=Pebble Intermediate CA 5712e7
+Serial:        129A827D34D19E87
+SAN:           localhost
+Valid:         2026-10-20T04:15:02Z .. 2026-10-20T04:20:01Z
+Remaining:     290s (0 days)
+Source:        acme:https://localhost:14000/dir
+Renew before:  240s   alert-days 1
+Renewals:      31 ok, 0 failed, last took 452 ms
+CERT_RENEWED log lines: 31
+<133>1 2026-10-20T04:15:02.748651Z bench-299 fw-mgmtd 5043 CERT_RENEWED [cert@32473 cn="localhost" serial="129A827D34D19E87" not-after="2026-10-20T04:20:01Z" ms="452"] certificate renewed (expires in 238s < renew-before 240s), serial 129A827D34D19E87

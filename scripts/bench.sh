@@ -30,3 +30,4 @@ grep -c CERT_RENEWED state/fw-mgmtd.log | sed 's/^/CERT_RENEWED log lines: /' >>
 grep 'CERT_RENEWED' state/fw-mgmtd.log | grep -v manual | head -3 >> "$OUT/certificate.txt"
 cat "$OUT/certificate.txt"
 kill $DPID $PEBBLE_PID 2>/dev/null; wait $DPID $PEBBLE_PID 2>/dev/null
+exit 0

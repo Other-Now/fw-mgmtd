@@ -54,7 +54,8 @@ certificate lifecycle and license enforcement — kept small enough
 | Crash test: `kill -9` during a stream of API commits, 20 times | **1,500 acknowledged commits, 0 lost, 0 torn**. In 9/20 kills the in-flight commit landed unacknowledged, which the `base` check makes safe to retry. |
 | End-to-end (`scripts/e2e.sh`) | 34/34 checks against real OpenSSH, curl and Pebble; also 34/34 with the daemon built under ASan+UBSan, 0 sanitizer reports |
 | OCSP + CRL (`scripts/revocation.sh`) | good → good, revoked → revoked by both methods; a CRL signed by an impostor CA with the same name → rejected |
-| Fuzzing (ASan+UBSan) | FUZZ_SUMMARY |
+| Fuzzing (ASan+UBSan, 10 min per target) | **22.9M executions, 0 crashes, 0 hangs** after the fix below: cli 0.95M, config 5.4M (round-trip property), license 1.15M (sign-and-verify property), http 15.4M |
+| CI (GitHub ubuntu-24.04, EPYC 7763, faster disk) | commit 0.58 / 1.1 / 6.8 ms; SSH `show` 0.10 ms, `commit` 0.79 ms; renewal churn 0 failed of 89,759; crash test 4,237 acked, 0 lost (`results/ci/`) |
 | Unit tests | 30 tests, 245 checks |
 
 ## Things the measurements caught

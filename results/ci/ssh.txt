@@ -1,0 +1,6 @@
+# CLI over SSH, persistent shell session, 300 iterations; login (TCP+kex+pubkey auth+shell) took 44.7 ms
+show configuration system hostname n=300   p50=    104.6  p90=    111.8  p99=    139.4  max=  40428.9 us
+show license                       n=300   p50=    107.1  p90=    111.1  p99=    127.6  max=    165.7 us
+set (config mode)                  n=300   p50=     95.6  p90=    104.6  p99=    132.7  max=    193.5 us
+commit (1 change, fsync)           n=300   p50=    793.4  p90=    931.6  p99=   1266.4  max=   4140.7 us
+one-shot exec (connect..close)     n=50    p50=  42974.4  p90=  43291.4  p99=  43969.2  max=  43969.2 us

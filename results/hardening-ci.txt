@@ -1,0 +1,8 @@
+PIE                                yes
+RELRO                              full (relro + bind_now)
+NX stack                           yes
+stack protector                    yes (__stack_chk_fail referenced)
+FORTIFY_SOURCE                     yes (2 fortified libc calls: __snprintf_chk ...)
+CET (IBT + SHSTK markers)          yes
+RPATH/RUNPATH                      none
+hardening: 0 required checks failed

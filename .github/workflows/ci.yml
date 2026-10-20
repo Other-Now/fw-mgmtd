@@ -7,6 +7,7 @@ env:
 jobs:
   test-and-bench:
     runs-on: ubuntu-24.04
+    defaults: { run: { shell: bash } }   # -eo pipefail, so "| tee" cannot hide a failure
     steps:
       - uses: actions/checkout@v4
       - name: deps
@@ -49,6 +50,7 @@ jobs:
 
   sanitizers:
     runs-on: ubuntu-24.04
+    defaults: { run: { shell: bash } }   # -eo pipefail, so "| tee" cannot hide a failure
     steps:
       - uses: actions/checkout@v4
       - name: deps
@@ -71,6 +73,7 @@ jobs:
 
   fuzz:
     runs-on: ubuntu-24.04
+    defaults: { run: { shell: bash } }   # -eo pipefail, so "| tee" cannot hide a failure
     steps:
       - uses: actions/checkout@v4
       - name: deps

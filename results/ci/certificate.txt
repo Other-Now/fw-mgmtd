@@ -1,0 +1,11 @@
+Subject:       (empty; identity is in the SAN)
+Issuer:        /CN=Pebble Intermediate CA 6943d4
+Serial:        25C4884A1C0549F9
+SAN:           localhost
+Valid:         2026-10-20T04:57:13Z .. 2026-10-20T05:02:12Z
+Remaining:     288s (0 days)
+Source:        acme:https://localhost:14000/dir
+Renew before:  240s   alert-days 1
+Renewals:      26 ok, 0 failed, last took 403 ms
+CERT_RENEWED log lines: 26
+<133>1 2026-10-20T04:57:15.840124Z bench-299 fw-mgmtd 8054 CERT_RENEWED [cert@32473 cn="localhost" serial="25C4884A1C0549F9" not-after="2026-10-20T05:02:12Z" ms="403"] certificate renewed (expires in 238s < renew-before 240s), serial 25C4884A1C0549F9

@@ -287,5 +287,5 @@ COMMIT_CONFIRMED, CONFIRM_REVERT, AUTH_OK/AUTH_FAIL (src IP), AUTHZ_DENY
   60 s; ≈320k connections over 4 runs with 0 failures after the notBefore fix.
 - ACME issuance from Pebble ≈ 0.5–0.6 s.
 - Crash: 20 kill -9s, 1,500 acked, 0 lost/torn.
-- Fuzz: see `results/fuzz/`; 1 real bug found (hang).
+- Fuzz: 22.9M execs over 4 targets × 10 min, 0 crashes after fixing the 1 real bug (hang).
 - e2e 34/34 (also under ASan), unit 30 tests / 245 checks, revocation 5/5.

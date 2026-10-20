@@ -1,0 +1,8 @@
+#393	INITED cov: 474 ft: 1242 corp: 205/19Kb exec/s: 0 rss: 80Mb
+#1148794	DONE   cov: 475 ft: 1383 corp: 293/98Kb lim: 4096 exec/s: 1911 rss: 576Mb
+Done 1148794 runs in 601 second(s)
+stat::number_of_executed_units: 1148794
+stat::average_exec_per_sec:     1911
+stat::new_units_added:          1080
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              576

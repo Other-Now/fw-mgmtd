@@ -1,0 +1,8 @@
+#1544	INITED cov: 1947 ft: 7992 corp: 675/41Kb exec/s: 1544 rss: 128Mb
+#953445	DONE   cov: 2057 ft: 13571 corp: 1632/274Kb lim: 859 exec/s: 1586 rss: 526Mb
+Done 953445 runs in 602 second(s)
+stat::number_of_executed_units: 953445
+stat::average_exec_per_sec:     1583
+stat::new_units_added:          4935
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              526

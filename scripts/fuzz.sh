@@ -5,7 +5,7 @@ set -uo pipefail
 SECS=${1:-60}
 bash "$SRC/scripts/build.sh" fuzz
 OUT=${OUT:-$SRC/results/fuzz}
-mkdir -p "$OUT"
+mkdir -p "$OUT"; OUT=$(cd "$OUT" && pwd)   # absolute: the loop cd's into the corpus dir
 status=0
 for t in cli config license http; do
   work=$HOME/fwm-fuzz/$t; mkdir -p "$work"; cp -n "$SRC"/fuzz/corpus/$t/* "$work"/ 2>/dev/null
